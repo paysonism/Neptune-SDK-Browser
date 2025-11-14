@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="resources/favicon.ico">
+    <title>Neptune SDK - Fortnite SDK Browser</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div id="LoadingOverlay" class="Loading">
+        <div class="LoadingContent">
+            <div class="LoadingTitle">Neptune SDK</div>
+            <div class="LoadingSubtitle">Loading Fortnite SDK data...</div>
+            <div class="LoadingSpinnerLarge"></div>
+            <div class="LoadingProgress">
+                <div class="LoadingProgressBar" style="width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+            <div id="LoadingStatus" style="font-size: 14px; color: var(--text-muted); margin-top: 8px;"></div>
+        </div>
+    </div>
+
+    <!-- Main Interface -->
+    <div class="Sidebar" id="sidebar">
+        <div class="SidebarHeader">
+            <div class="HeaderTop">
+                <!-- <div class="SidebarTitle">Neptune SDK</div> -->
+                <img src="resources/logo.png" alt="Your Logo" class="SidebarLogo">
+            </div>
+            <div
+                style="font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--spacing-sm); word-break: break-all; display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm);">
+                <span>++Fortnite+Release-38.10-CL-47888945</span>
+                <span class="Notice success" title="SDK Updated">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"></path>
+                    </svg>
+                    <span>SDK Updated</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="SidebarSearch">
+            <div class="SearchContainer">
+                <div class="SearchIcon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </div>
+                <input type="text" class="SearchInput" id="SearchInput" placeholder="Filter classes...">
+            </div>
+        </div>
+
+        <div class="ClassList" id="ClassList">
+            <!-- Dynamic content loaded by loader.js -->
+        </div>
+
+        <div class="SidebarFooter">
+            <div
+                style="font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--spacing-sm); word-break: break-all; display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm);">
+                <div class="Dot"></div>
+                <span>Made By Payson - github.com/paysonism</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="SidebarResizer" id="SidebarResizer"></div>
+
+    <div class="MainContent">
+        <div class="ContentHeader">
+            <div class="HeaderTopRow">
+                <div class="ClassTitle" id="ClassTitle">Select a class</div>
+                <div class="TopSearchContainer">
+                    <svg class="TopSearchIcon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" class="TopSearchInput" placeholder="Search offsets, members, types..."
+                        id="TopSearchInput">
+                    <div class="GlobalSearchDropdown" id="GlobalSearchDropdown"></div>
+                </div>
+            </div>
+            <div class="Inheritance" id="Inheritance"></div>
+            <div class="Stats" id="Stats" style="display: none;">
+                <div class="StatCard">
+                    <div class="StatNumber" id="MemberCount">0</div>
+                    <div class="StatLabel">Members</div>
+                </div>
+                <div class="StatCard">
+                    <div class="StatNumber" id="ClassSize">0x0</div>
+                    <div class="StatLabel">Size</div>
+                </div>
+                <div class="StatCard">
+                    <div class="StatNumber" id="ClassType">class</div>
+                    <div class="StatLabel">Type</div>
+                </div>
+            </div>
+            <div class="Tabs">
+                <button class="Tab Active" onclick="ShowTab('overview')">Overview</button>
+                <button class="Tab" onclick="ShowTab('struct')">Structure</button>
+            </div>
+        </div>
+
+        <div class="ContentBody">
+            <div id="OverviewContent">
+                <table class="MembersTable">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Member</th>
+                            <th>Offset</th>
+                            <th>Size</th>
+                        </tr>
+                    </thead>
+                    <tbody id="MembersTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="StructContent" class="Hidden">
+                <div id="StructViewer" class="StructViewer">
+                    <div class="NoData">Select a class to view its structure</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="loader.js"></script>
+
+    <script>
+        let viewer;
+        let debugMode = false; // DEVELOPER MODE
+
+        function debugLog(message, data = null) {
+            if (debugMode) {
+                console.log(`[DEBUG] ${new Date().toISOString()} - ${message}`);
+                if (data !== null) {
+                    console.log('[DEBUG DATA]', data);
+                }
+            }
+        }
+
+        function ShowTab(tabName) {
+            debugLog(`Switching to tab: ${tabName}`);
+
+            document.querySelectorAll('.Tab').forEach(tab => {
+                tab.classList.remove('Active');
+            });
+            event.target.classList.add('Active');
+
+            if (tabName === 'overview') {
+                document.getElementById('OverviewContent').classList.remove('Hidden');
+                document.getElementById('StructContent').classList.add('Hidden');
+            } else if (tabName === 'struct') {
+                document.getElementById('OverviewContent').classList.add('Hidden');
+                document.getElementById('StructContent').classList.remove('Hidden');
+            }
+
+            debugLog(`Tab switch completed: ${tabName}`);
+        }
+
+        class SDKViewer {
+            constructor() {
+                debugLog('SDKViewer constructor called');
+
+                this.sdkData = [];
+                this.globals = null;
+                this.filteredClasses = [];
+                this.currentClass = null;
+                this.currentTab = 'overview';
+                this.loadStartTime = Date.now();
+
+                debugLog('SDKViewer properties initialized');
+
+                this.init();
+            }
+
+            async init() {
+                debugLog('Starting SDK Viewer initialization...');
+
+                try {
+                    debugLog('Setting up event listeners...');
+                    this.setupEventListeners();
+                    debugLog('Event listeners setup completed');
+
+                    debugLog('Starting SDK data load...');
+                    await this.loadSDKData();
+                    debugLog('SDK data load completed');
+
+                    debugLog('Hiding loading screen...');
+                    this.hideLoading();
+                    debugLog('Loading screen hidden');
+
+                    const totalTime = Date.now() - this.loadStartTime;
+                    debugLog(`SDK Viewer initialized successfully in ${totalTime}ms`);
+
+                } catch (error) {
+                    console.error('[ERROR] SDK Viewer initialization failed:', error);
+                    this.updateLoadingStatus('Initialization failed - see console for details');
+                }
+            }
+
+            setupEventListeners() {
+                debugLog('Setting up event listeners...');
+
+                const searchInput = document.getElementById('SearchInput');
+                debugLog(`SearchInput element found: ${!!searchInput}`);
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        debugLog(`Search input changed: "${e.target.value}"`);
+                        this.filterClasses(e.target.value);
+                    });
+                } else {
+                    console.warn('[WARN] SearchInput element not found');
+                }
+
+                const topSearchInput = document.getElementById('TopSearchInput');
+                debugLog(`TopSearchInput element found: ${!!topSearchInput}`);
+                if (topSearchInput) {
+                    topSearchInput.addEventListener('input', (e) => {
+                        debugLog(`Top search input changed: "${e.target.value}"`);
+                        this.filterCurrentData(e.target.value);
+                    });
+                } else {
+                    console.warn('[WARN] TopSearchInput element not found');
+                }
+
+                const globalSearchDropdown = document.getElementById('GlobalSearchDropdown');
+                debugLog(`GlobalSearchDropdown element found: ${!!globalSearchDropdown}`);
+
+                if (topSearchInput && globalSearchDropdown) {
+                    topSearchInput.addEventListener('focus', () => {
+                        debugLog('Top search input focused');
+                        if (topSearchInput.value.trim()) {
+                            globalSearchDropdown.style.display = 'block';
+                        }
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (!topSearchInput.contains(e.target) && !globalSearchDropdown.contains(e.target)) {
+                            globalSearchDropdown.style.display = 'none';
+                        }
+                    });
+                }
+
+                debugLog('Setting up sidebar resizer...');
+                this.setupResizer();
+
+                debugLog('Event listeners setup completed');
+            }
+
+            setupResizer() {
+                const resizer = document.getElementById('SidebarResizer');
+                const sidebar = document.getElementById('sidebar');
+
+                debugLog(`Resizer found: ${!!resizer}, Sidebar found: ${!!sidebar}`);
+
+                if (!resizer || !sidebar) {
+                    console.warn('[WARN] Sidebar resizer elements not found');
+                    return;
+                }
+
+                let isResizing = false;
+
+                resizer.addEventListener('mousedown', (e) => {
+                    debugLog('Sidebar resize started');
+                    isResizing = true;
+                    document.addEventListener('mousemove', handleResize);
+                    document.addEventListener('mouseup', stopResize);
+                    e.preventDefault();
+                });
+
+                const handleResize = (e) => {
+                    if (!isResizing) return;
+                    const newWidth = Math.max(250, Math.min(600, e.clientX));
+                    sidebar.style.width = newWidth + 'px';
+                };
+
+                const stopResize = () => {
+                    if (isResizing) {
+                        debugLog('Sidebar resize stopped');
+                        isResizing = false;
+                        document.removeEventListener('mousemove', handleResize);
+                        document.removeEventListener('mouseup', stopResize);
+                    }
+                };
+            }
+
+            async loadSDKData() {
+                const startTime = Date.now();
+                debugLog('Starting loadSDKData...');
+
+                try {
+                    this.updateLoadingStatus('Checking for SDK files...');
+                    this.updateProgress(5);
+
+                    debugLog('Attempting to load local SDK data from ./Data/sdk_data.json');
+
+                    try {
+                        const fetchStart = Date.now();
+                        const response = await fetch('./Data/sdk_data.json');
+                        const fetchTime = Date.now() - fetchStart;
+
+                        debugLog(`Fetch completed in ${fetchTime}ms, status: ${response.status}`);
+
+                        if (response.ok) {
+                            this.updateLoadingStatus('Parsing SDK data...');
+                            this.updateProgress(20);
+
+                            const parseStart = Date.now();
+
+                            const contentLength = response.headers.get('content-length');
+                            if (contentLength) {
+                                const fileSizeMB = parseInt(contentLength) / (1024 * 1024);
+                                debugLog(`SDK file size: ${fileSizeMB.toFixed(2)} MB`);
+                                this.updateLoadingStatus(`Parsing large SDK file (${fileSizeMB.toFixed(1)}MB)...`);
+
+                                if (fileSizeMB > 50) {
+                                    this.updateLoadingStatus('Large file detected - this may take a moment...');
+                                }
+                            }
+
+                            const text = await response.text();
+                            debugLog(`Text extraction completed, length: ${text.length} characters`);
+
+                            this.updateLoadingStatus('Converting JSON data...');
+                            this.updateProgress(35);
+
+                            let parseTimeout = setTimeout(() => {
+                                debugLog('JSON parsing is taking longer than expected...');
+                                this.updateLoadingStatus('Large file - still parsing...');
+                                this.updateProgress(40);
+                            }, 3000);
+
+                            try {
+                                this.sdkData = JSON.parse(text);
+                                clearTimeout(parseTimeout);
+
+                                const parseTime = Date.now() - parseStart;
+                                debugLog(`JSON parsing completed in ${parseTime}ms`);
+
+                            } catch (parseError) {
+                                clearTimeout(parseTimeout);
+                                throw new Error(`JSON parsing failed: ${parseError.message}`);
+                            }
+
+                            if (Array.isArray(this.sdkData) && this.sdkData.length > 0) {
+                                debugLog('SDK data structure looks valid');
+
+                                const classesWithMembers = this.sdkData.filter(cls => cls.M && cls.M.length > 0);
+                                debugLog(`Classes with members: ${classesWithMembers.length}/${this.sdkData.length}`);
+
+                                if (classesWithMembers.length > 0) {
+                                    debugLog('Sample class with members:', classesWithMembers[0]);
+                                }
+
+                            } else {
+                                throw new Error('Invalid SDK data structure');
+                            }
+                        } else {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                    } catch (localError) {
+                        debugLog('Local data load failed:', localError);
+                        console.warn('[WARN] Local data not found, using sample data');
+
+                        this.sdkData = [
+                            {
+                                "N": "UObject",
+                                "P": "",
+                                "S": 40,
+                                "T": "class",
+                                "M": [
+                                    { "N": "VTable", "T": "void*", "O": "0x0", "S": "0x8" },
+                                    { "N": "ObjectFlags", "T": "uint32", "O": "0x8", "S": "0x4" },
+                                    { "N": "InternalIndex", "T": "int32", "O": "0xC", "S": "0x4" }
+                                ]
+                            },
+                            {
+                                "N": "AActor",
+                                "P": "UObject",
+                                "S": 1000,
+                                "T": "class",
+                                "M": [
+                                    { "N": "RootComponent", "T": "USceneComponent*", "O": "0x1B0", "S": "0x8" },
+                                    { "N": "ActorLocation", "T": "FVector", "O": "0x1C0", "S": "0xC" }
+                                ]
+                            }
+                        ];
+                        debugLog('Using sample data with 2 classes');
+                    }
+
+                    this.updateProgress(50);
+                    this.updateLoadingStatus('Loading globals...');
+
+                    try {
+                        const globalsResponse = await fetch('./Data/globals.json');
+                        if (globalsResponse.ok) {
+                            this.globals = await globalsResponse.json();
+                            debugLog('Globals loaded successfully:', this.globals);
+                        } else {
+                            debugLog('Globals file not found, using defaults');
+                        }
+                    } catch (e) {
+                        debugLog('Globals load error:', e);
+                        this.globals = { bases: {}, offsets: {} };
+                    }
+
+                    this.updateProgress(70);
+                    this.updateLoadingStatus('Processing class list...');
+
+                    const processStart = Date.now();
+                    this.filteredClasses = this.sdkData.map(cls => cls.N).sort();
+                    const processTime = Date.now() - processStart;
+
+                    debugLog(`Class list processing completed in ${processTime}ms`);
+                    debugLog(`Total classes: ${this.filteredClasses.length}`);
+
+                    this.updateProgress(90);
+                    this.updateLoadingStatus('Rendering interface...');
+
+                    const renderStart = Date.now();
+                    this.renderClassList();
+                    const renderTime = Date.now() - renderStart;
+
+                    debugLog(`Class list rendering completed in ${renderTime}ms`);
+
+                    this.updateProgress(100);
+
+                    const totalTime = Date.now() - startTime;
+                    debugLog(`SDK loading completed in ${totalTime}ms`);
+
+                } catch (error) {
+                    console.error('[ERROR] Failed to load SDK data:', error);
+                    this.updateLoadingStatus(`Failed to load SDK data: ${error.message}`);
+
+                    setTimeout(() => {
+                        this.hideLoading();
+                        const contentBody = document.querySelector('.ContentBody');
+                        if (contentBody) {
+                            contentBody.innerHTML = `<div class="Error">Failed to load SDK data: ${error.message}<br>Check console for details.</div>`;
+                        }
+                    }, 2000);
+                }
+            }
+
+            renderClassList() {
+                const startTime = Date.now();
+                debugLog('Starting renderClassList...');
+
+                const classList = document.getElementById('ClassList');
+                if (!classList) {
+                    console.error('[ERROR] ClassList element not found');
+                    return;
+                }
+
+                debugLog(`Rendering ${this.filteredClasses.length} classes...`);
+
+                classList.innerHTML = '';
+
+                const batchSize = 100;
+                let rendered = 0;
+
+                const renderBatch = () => {
+                    const batchStart = Date.now();
+                    const fragment = document.createDocumentFragment();
+
+                    for (let i = 0; i < batchSize && rendered < this.filteredClasses.length; i++, rendered++) {
+                        const className = this.filteredClasses[rendered];
+                        const item = document.createElement('div');
+                        item.className = 'ClassItem';
+                        item.textContent = className;
+
+                        if (className.length > 25) {
+                            item.title = className;
+                        }
+
+                        item.addEventListener('click', () => {
+                            this.selectClass(className);
+                        });
+                        fragment.appendChild(item);
+                    }
+
+                    classList.appendChild(fragment);
+
+                    const batchTime = Date.now() - batchStart;
+                    debugLog(`Rendered batch ${Math.floor(rendered / batchSize)}: ${batchSize} items in ${batchTime}ms`);
+
+                    if (rendered < this.filteredClasses.length) {
+                        requestAnimationFrame(renderBatch);
+                    } else {
+                        const totalTime = Date.now() - startTime;
+                        debugLog(`Class list rendering completed: ${rendered} items in ${totalTime}ms`);
+                    }
+                };
+
+                renderBatch();
+            }
+
+            filterClasses(query) {
+                const startTime = Date.now();
+                debugLog(`Filtering classes with query: "${query}"`);
+
+                const search = query.toLowerCase();
+                this.filteredClasses = this.sdkData
+                    .map(cls => cls.N)
+                    .filter(name => name.toLowerCase().includes(search))
+                    .sort();
+
+                const filterTime = Date.now() - startTime;
+                debugLog(`Filtering completed: ${this.filteredClasses.length} results in ${filterTime}ms`);
+
+                this.renderClassList();
+            }
+
+            filterCurrentData(query) {
+                debugLog(`Filtering current data with query: "${query}"`);
+                if (this.currentClass) {
+                    this.displayClassMembers(query);
+                }
+            }
+
+            selectClass(className) {
+                debugLog(`Selecting class: ${className}`);
+
+                this.currentClass = className;
+
+                document.querySelectorAll('.ClassItem').forEach(item => {
+                    item.classList.toggle('Active', item.textContent === className);
+                });
+
+                const classData = this.sdkData.find(cls => cls.N === className);
+                if (!classData) {
+                    console.error(`[ERROR] Class ${className} not found in data`);
+                    return;
+                }
+
+                debugLog('Found class data:', classData);
+
+                const isGlobals = (className === 'Globals');
+                document.body.classList.toggle('GlobalsMode', isGlobals);
+
+                this.displayClassInfo(classData);
+                this.displayClassMembers();
+
+                debugLog(`Class selection completed: ${className}`);
+            }
+
+            displayClassInfo(classData) {
+                debugLog('Displaying class info:', classData);
+
+                const classTitle = document.getElementById('ClassTitle');
+                if (classTitle) {
+                    classTitle.textContent = classData.N;
+                }
+
+                const inheritance = document.getElementById('Inheritance');
+                if (inheritance) {
+                    if (classData.P) {
+                        inheritance.textContent = `Inherits from: ${classData.P}`;
+                        inheritance.style.display = 'block';
+                    } else {
+                        inheritance.style.display = 'none';
+                    }
+                }
+
+                const stats = document.getElementById('Stats');
+                const memberCount = document.getElementById('MemberCount');
+                const classSize = document.getElementById('ClassSize');
+                const classType = document.getElementById('ClassType');
+
+                if (memberCount) memberCount.textContent = classData.M ? classData.M.length : 0;
+                if (classSize) classSize.textContent = `0x${classData.S.toString(16).toUpperCase()}`;
+                if (classType) classType.textContent = classData.T || 'class';
+                if (stats) stats.style.display = 'flex';
+
+                const isGlobals = (classData.N === 'Globals');
+                const sizeCard = document.querySelectorAll('.Stats .StatCard')[1];
+                if (sizeCard) sizeCard.style.display = isGlobals ? 'none' : '';
+
+                debugLog('Class info display completed');
+            }
+
+            displayClassMembers(searchQuery = '') {
+                debugLog(`Displaying class members, search: "${searchQuery}"`);
+
+                const tbody = document.getElementById('MembersTableBody');
+                if (!tbody || !this.currentClass) {
+                    debugLog('No tbody or current class');
+                    return;
+                }
+
+                const classData = this.sdkData.find(cls => cls.N === this.currentClass);
+                if (!classData || !classData.M) {
+                    debugLog('No class data or members found');
+                    const isGlobals = (this.currentClass === 'Globals');
+                    const colSpan = isGlobals ? '3' : '4';
+                    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="NoData">No members found</td></tr>`;
+                    return;
+                }
+
+                let members = classData.M;
+                if (searchQuery) {
+                    const search = searchQuery.toLowerCase();
+                    members = members.filter(member =>
+                        (member.N && member.N.toLowerCase().includes(search)) ||
+                        (member.T && member.T.toLowerCase().includes(search)) ||
+                        (member.O && member.O.toLowerCase().includes(search))
+                    );
+                }
+
+                debugLog(`Displaying ${members.length} members`);
+
+                const isGlobals = (this.currentClass === 'Globals');
+
+                const basicTypes = ['bool', 'float', 'int', 'hex', 'char', 'double', 'void', 'struct', 'class', 'enum', 'string', 'vector', 'array', 'map', 'set', 'list', 'pair', 'tuple', 'uint8_t', 'uint16_t', 'uint32_t', 'uint64_t', 'int8_t', 'int16_t', 'int32_t', 'int64_t', 'size_t', 'ptrdiff_t'];
+
+                tbody.innerHTML = members.map(member => {
+                    const isBasicType = member.T && basicTypes.includes(member.T.toLowerCase());
+                    const typeClass = isBasicType ? 'TypeColumn basic-type' : 'TypeColumn';
+                    const clickHandler = isBasicType ? '' : `onclick="NavigateToType('${member.T}')"`;
+
+                    if (isGlobals) {
+                        return `
+                            <tr>
+                                <td class="${typeClass}" ${clickHandler}>${member.T || 'Unknown'}</td>
+                                <td class="MemberColumn">${member.N || 'Unknown'}</td>
+                                <td class="OffsetColumn">${member.O || '0x0'}</td>
+                            </tr>
+                        `;
+                    } else {
+                        return `
+                            <tr>
+                                <td class="${typeClass}" ${clickHandler}>${member.T || 'Unknown'}</td>
+                                <td class="MemberColumn">${member.N || 'Unknown'}</td>
+                                <td class="OffsetColumn">${member.O || '0x0'}</td>
+                                <td class="SizeColumn">${member.S || '0x0'}</td>
+                            </tr>
+                        `;
+                    }
+                }).join('');
+
+                if (members.length === 0) {
+                    const colSpan = isGlobals ? '3' : '4';
+                    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="NoData">No matching members found</td></tr>`;
+                }
+
+                debugLog('Members display completed');
+            }
+
+            updateLoadingStatus(status) {
+                const loadingStatus = document.getElementById('LoadingStatus');
+                if (loadingStatus) {
+                    loadingStatus.textContent = status;
+                }
+                debugLog(`Loading status: ${status}`);
+            }
+
+            updateProgress(percent) {
+                const progressBar = document.querySelector('.LoadingProgressBar');
+                if (progressBar) {
+                    progressBar.style.width = percent + '%';
+                }
+                debugLog(`Progress: ${percent}%`);
+            }
+
+            hideLoading() {
+                debugLog('Hiding loading overlay...');
+                const loadingOverlay = document.getElementById('LoadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                    debugLog('Loading overlay hidden');
+                } else {
+                    console.warn('[WARN] LoadingOverlay element not found');
+                }
+            }
+        }
+
+        function NavigateToType(typeName) {
+            if (viewer && viewer.selectClass) {
+                const cleanTypeName = typeName.replace(/[*<>]/g, '').trim();
+                viewer.selectClass(cleanTypeName);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            debugLog('DOM loaded, initializing SDK Viewer...');
+            if (!viewer) {
+                viewer = new SDKViewer();
+            }
+        });
+
+        if (document.readyState === 'loading') {
+            debugLog('DOM still loading, adding event listener...');
+            document.addEventListener('DOMContentLoaded', function () {
+                if (!viewer) {
+                    debugLog('Creating viewer from DOMContentLoaded event');
+                    viewer = new SDKViewer();
+                }
+            });
+        } else {
+            debugLog('DOM already loaded, initializing immediately');
+            if (!viewer) {
+                viewer = new SDKViewer();
+            }
+        }
+
+        debugLog('Script loaded, DOM state:', document.readyState);
+        debugLog('Available elements:', {
+            LoadingOverlay: !!document.getElementById('LoadingOverlay'),
+            SearchInput: !!document.getElementById('SearchInput'),
+            TopSearchInput: !!document.getElementById('TopSearchInput'),
+            ClassList: !!document.getElementById('ClassList'),
+            MembersTableBody: !!document.getElementById('MembersTableBody')
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (node.nodeType === 1) {
+                            const classItems = node.classList && node.classList.contains('ClassItem')
+                                ? [node]
+                                : node.querySelectorAll ? node.querySelectorAll('.ClassItem') : [];
+
+                            classItems.forEach(function (item) {
+                                if (item.textContent && item.textContent.length > 25) {
+                                    item.setAttribute('title', item.textContent);
+                                }
+
+                                item.style.fontFamily = "'Bahnschrift', 'Bahnschrift-Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif";
+                            });
+                        }
+                    });
+                });
+            });
+
+            const classList = document.getElementById('ClassList');
+            if (classList) {
+                observer.observe(classList, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+        });
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('open');
+            }
+        }
+
+        if (window.innerWidth <= 768) {
+            const menuButton = document.createElement('button');
+            menuButton.className = 'MobileMenuButton';
+            menuButton.innerHTML = '☰';
+            menuButton.onclick = toggleMobileMenu;
+            document.body.appendChild(menuButton);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('SearchInput');
+            const topSearchInput = document.getElementById('TopSearchInput');
+
+            if (searchInput) {
+                searchInput.style.cssText = `
+            width: 100% !important;
+            padding: 0.75rem 1rem 0.75rem 2.5rem !important;
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: #fafafa !important;
+            font-size: 0.875rem !important;
+            border-radius: 12px !important;
+            font-family: 'Bahnschrift', 'Bahnschrift-Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif !important;
+            font-weight: 500 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+            box-sizing: border-box;
+        `;
+
+                searchInput.addEventListener('focus', function () {
+                    this.style.background = 'rgba(255, 255, 255, 0.06) !important';
+                    this.style.borderColor = '#6366f1 !important';
+                    this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1) !important';
+                    this.style.transform = 'translateY(-1px)';
+                });
+
+                searchInput.addEventListener('blur', function () {
+                    this.style.background = 'rgba(255, 255, 255, 0.04) !important';
+                    this.style.borderColor = 'rgba(255, 255, 255, 0.08) !important';
+                    this.style.boxShadow = 'none !important';
+                    this.style.transform = 'translateY(0)';
+                });
+            }
+
+            if (topSearchInput) {
+                topSearchInput.style.fontFamily = "'Bahnschrift', 'Bahnschrift-Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif";
+                topSearchInput.style.fontWeight = '500';
+            }
+        });
+    </script>
+</body>
+
+</html>

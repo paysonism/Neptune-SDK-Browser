@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neptune FN SDK</title>
+    <link rel="icon" type="image/x-icon" href="Latest/resources/favicon.ico">
+    <link rel="stylesheet" href="Latest/styles.css">
+    <style>
+        .LandingContainer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3);
+    width: 100%;
+}
+
+.LandingCard {
+    max-width: 700px;
+    width: 100%;
+    background: var(--bg-glass);
+    backdrop-filter: var(--blur-light);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: var(--space-4);
+    box-shadow: var(--shadow);
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+    margin: 0 auto;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.HeroLogo {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto var(--space-3);
+    /* background: linear-gradient(135deg, var(--accent), #8b5cf6); */
+    border-radius: 0px;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.HeroTitle {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: var(--space-2);
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+.HeroSubtitle {
+    text-align: center;
+    font-size: 18px;
+    color: var(--text-2);
+    margin-bottom: var(--space-2);
+    font-weight: 500;
+}
+
+.HeroDescription { 
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-3);
+    line-height: 1.5;
+    margin-bottom: var(--space-4);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.ActionButtons {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.PrimaryButton {
+    background: var(--accent);
+    color: white !important;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.PrimaryButton:hover {
+    background: #6646f3;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+}
+
+.PrimaryButton:visited {
+    color: white !important;
+}
+
+.SecondaryButton {
+    background: var(--accent);
+    color: white !important;
+    padding: 12px 24px;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.SecondaryButton:hover {
+    background: #6646f3;
+    border-color: #6646f3;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(144, 99, 241, 0.3);
+}
+
+.SecondaryButton:visited {
+    color: white !important;
+}
+
+/* Ensure all link states maintain the same color */
+.PrimaryButton:link,
+.PrimaryButton:visited,
+.PrimaryButton:hover,
+.PrimaryButton:active {
+    color: white !important;
+}
+
+.SecondaryButton:link,
+.SecondaryButton:visited,
+.SecondaryButton:hover,
+.SecondaryButton:active {
+    color: white !important;
+}
+
+.ResourcesSection {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.ResourcesTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin-bottom: var(--space-3);
+}
+
+.ResourcesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+}
+
+.ResourceCard {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: var(--space-3);
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+    text-align: center;
+}
+
+.ResourceIcon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-2);
+    font-size: 16px;
+}
+
+.ResourceName {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-1);
+    margin-bottom: var(--space-1);
+}
+
+.ResourceDescription {
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.4;
+}
+
+.VersionInfo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.VersionBadge {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .LandingContainer {
+        padding: var(--space-2);
+    }
+    
+    .LandingCard {
+        padding: var(--space-3);
+        border-radius: 12px;
+    }
+    
+    .HeroTitle {
+        font-size: 28px;
+    }
+    
+    .HeroSubtitle {
+        font-size: 16px;
+    }
+    
+    .ActionButtons {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    
+    .PrimaryButton, .SecondaryButton {
+        width: 100%;
+        max-width: 250px;
+        justify-content: center;
+    }
+    
+    .ResourcesGrid {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="LandingContainer">
+        <div class="LandingCard">
+            <img src="Latest/resources/logo.png" alt="Neptune SDK Logo" class="HeroLogo">
+            
+            <h1 class="HeroTitle">Neptune SDK</h1>
+            <h2 class="HeroSubtitle">Fortnite Offsets and SDK</h2>
+            
+            <p class="HeroDescription">
+                Explore this complete SDK vdump of Fortnite, featuring up-to-date offsets, class structures, and function signatures with an easy to use interface. Perfect for developers and modders looking to build advanced cheats for Fortnite.
+            </p>
+
+            <div class="ActionButtons">
+                <a href="Latest/" class="PrimaryButton">
+                    View SDK
+                </a>
+                <a href="https://github.com/paysonism" class="SecondaryButton">
+                    GitHub
+                </a>
+            </div>
+                <!--
+            <div class="ResourcesSection">
+                <h3 class="ResourcesTitle">Related Projects</h3>
+                
+                <div class="ResourcesGrid">
+                    <a href="https://github.com/EpicGames/UnrealEngine" class="ResourceCard">
+                        <div class="ResourceIcon">🎮</div>
+                        <div class="ResourceName"></div>
+                        <div class="ResourceDescription">Official Unreal Engine repository and documentation for game development.</div>
+                    </a>
+                    
+                    <a href="https://github.com/praydog/REFramework" class="ResourceCard">
+                        <div class="ResourceIcon">🔧</div>
+                        <div class="ResourceName">REFramework</div>
+                        <div class="ResourceDescription">Modding framework and scripting platform for reverse engineering.</div>
+                    </a>
+                    
+                    <a href="https://github.com/x64dbg/x64dbg" class="ResourceCard">
+                        <div class="ResourceIcon">🐛</div>
+                        <div class="ResourceName">x64dbg</div>
+                        <div class="ResourceDescription">Open-source x64/x32 debugger for Windows applications.</div>
+                    </a>
+                    
+                    <a href="https://github.com/cheat-engine/cheat-engine" class="ResourceCard">
+                        <div class="ResourceIcon">⚡</div>
+                        <div class="ResourceName">Cheat Engine</div>
+                        <div class="ResourceDescription">Memory scanner and debugger for analyzing game internals.</div>
+                    </a>
+                    
+                    <a href="https://github.com/microsoft/Detours" class="ResourceCard">
+                        <div class="ResourceIcon">🔗</div>
+                        <div class="ResourceName">Microsoft Detours</div>
+                        <div class="ResourceDescription">Library for intercepting Win32 functions on x86/x64 machines.</div>
+                    </a>
+                    
+                    <a href="https://github.com/processhacker/processhacker" class="ResourceCard">
+                        <div class="ResourceIcon">📊</div>
+                        <div class="ResourceName">Process Hacker</div>
+                        <div class="ResourceDescription">Advanced system monitor and process analyzer for Windows.</div>
+                    </a>
+                </div>
+            -->
+
+                <div class="VersionInfo">
+                    <div class="VersionBadge">Fortnite 38.10-CL</div>
+                    <div class="VersionBadge">Live Data</div>
+                    <div class="VersionBadge">Fast Response Time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
