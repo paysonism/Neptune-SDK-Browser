@@ -7,10 +7,67 @@
     <link rel="icon" type="image/x-icon" href="resources/favicon.ico">
     <title>Neptune SDK - Fortnite SDK Browser</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .recyclerviewport {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+        .recycleractive {
+            overflow: visible !important;
+            height: auto !important;
+        }
+
+        .ClassList .recyclerviewport {
+            overflow-y: auto;
+        }
+
+        .ClassList .recycleractive {
+            overflow: visible;
+        }
+
+        .ClassList {
+            scroll-behavior: smooth;
+            overflow-y: auto;
+            overflow-x: hidden !important;
+            display: block;
+            padding: 0;
+            position: relative;
+        }
+
+        .ClassList>div {
+            overflow: hidden !important;
+            width: 100%;
+        }
+
+        .ClassItem {
+            padding: 12px 16px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            display: block !important;
+            line-height: 1.4;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .ClassItem:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .ClassItem.Active {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Loading Overlay -->
+
     <div id="LoadingOverlay" class="Loading">
         <div class="LoadingContent">
             <div class="LoadingTitle">Neptune SDK</div>
@@ -23,11 +80,11 @@
         </div>
     </div>
 
-    <!-- Main Interface -->
+
     <div class="Sidebar" id="sidebar">
         <div class="SidebarHeader">
             <div class="HeaderTop">
-                <!-- <div class="SidebarTitle">Neptune SDK</div> -->
+
                 <img src="resources/logo.png" alt="Your Logo" class="SidebarLogo">
             </div>
             <div
@@ -55,7 +112,7 @@
         </div>
 
         <div class="ClassList" id="ClassList">
-            <!-- Dynamic content loaded by loader.js -->
+
         </div>
 
         <div class="SidebarFooter">
@@ -133,7 +190,7 @@
 
     <script>
         let viewer;
-        let debugMode = false; // DEVELOPER MODE
+        let debugMode = false;
 
         function debugLog(message, data = null) {
             if (debugMode) {

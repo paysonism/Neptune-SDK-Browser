@@ -228,6 +228,11 @@ function PopulateClassList() {
     viewport.className = 'RecyclerViewport';
     viewport.id = 'RecyclerViewport';
     viewport.style.minHeight = '100%';
+    viewport.style.width = '100%';
+    viewport.style.maxWidth = '100%';
+    viewport.style.overflowX = 'hidden';
+    viewport.style.padding = '8px';
+    viewport.style.boxSizing = 'border-box';
     const spacer = document.createElement('div');
     spacer.className = 'RecyclerSpacer';
     spacer.id = 'RecyclerSpacer';
@@ -259,7 +264,7 @@ function PopulateClassList() {
         }
     });
     Recycler.update();
-    console.log(`https://github.com/paysonism`);
+    console.log(`Made By https://github.com/paysonism\n\nPlease Star the repo if you like this project and would like it to keep recieving updates -> https://github.com/paysonism/Neptune-SDK-Browser`);
 }
 
 function SelectClass(ClassName) {
@@ -285,11 +290,11 @@ function SelectClass(ClassName) {
         document.getElementById('ClassType').textContent = CurrentClass.t || 'class';
         document.getElementById('Stats').style.display = 'flex';
         
-        // Add or remove globals mode class
+        
         const isGlobals = (ClassName === 'Globals');
         document.body.classList.toggle('GlobalsMode', isGlobals);
         
-        // Hide/show size stat card for globals
+        
         const sizeCard = document.querySelectorAll('.Stats .StatCard')[1];
         if (sizeCard) sizeCard.style.display = isGlobals ? 'none' : '';
         
@@ -304,14 +309,14 @@ function SelectClass(ClassName) {
                 const Row = document.createElement('tr');
                 
                 if (isGlobals) {
-                    // For globals, don't show size column
+                    
                     Row.innerHTML = `
                         <td class="${typeClass}" ${isBasicType ? '' : `onclick="NavigateToType('${member.t}')"`}>${member.t}</td>
                         <td class="MemberColumn">${member.n}</td>
                         <td class="OffsetColumn">${member.o}</td>
                     `;
                 } else {
-                    // For regular classes, show all columns
+                    
                     Row.innerHTML = `
                         <td class="${typeClass}" ${isBasicType ? '' : `onclick="NavigateToType('${member.t}')"`}>${member.t}</td>
                         <td class="MemberColumn">${member.n}</td>
@@ -626,7 +631,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('TopSearchInput').addEventListener('input', debounce(GlobalSearchDropdown, 200));
 
 });
-// Sidebar resizer
+
 (function setupSidebarResizer() {
     const resizer = document.getElementById('SidebarResizer');
     const sidebar = document.querySelector('.Sidebar');
@@ -665,10 +670,18 @@ function CreateVanillaRecyclerView(config) {
             el.style.position = 'absolute';
             el.style.left = '0';
             el.style.right = '0';
+            el.style.width = '100%';
+            el.style.maxWidth = '100%';
             el.style.height = rowHeight + 'px';
             el.style.top = '0';
             el.style.display = 'block';
             el.style.zIndex = '1';
+            el.style.overflow = 'hidden';
+            el.style.whiteSpace = 'nowrap';
+            el.style.textOverflow = 'ellipsis';
+            el.style.paddingLeft = '20px';
+            el.style.paddingRight = '20px';
+            el.style.boxSizing = 'border-box';
             viewport.appendChild(el);
             pool.push(el);
         }
