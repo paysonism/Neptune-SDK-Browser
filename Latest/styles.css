@@ -251,6 +251,7 @@ body {
     display: flex;
     flex-direction: column;
     will-change: transform;
+    overflow-x: hidden;
 }
 
 .SidebarHeader {
@@ -939,4 +940,51 @@ body {
     .MobileMenuButton {
         display: none;
     }
+}
+
+/* Custom Scrollbar Styles */
+
+/* WebKit Browsers (Chrome, Safari, Edge) */
+.Sidebar,
+.ClassList,
+.RecyclerViewport,
+.ContentBody,
+.GlobalSearchDropdown {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.6) transparent;
+}
+
+.Sidebar::-webkit-scrollbar,
+.ClassList::-webkit-scrollbar,
+.RecyclerViewport::-webkit-scrollbar,
+.ContentBody::-webkit-scrollbar,
+.GlobalSearchDropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.Sidebar::-webkit-scrollbar-track,
+.ClassList::-webkit-scrollbar-track,
+.RecyclerViewport::-webkit-scrollbar-track,
+.ContentBody::-webkit-scrollbar-track,
+.GlobalSearchDropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.Sidebar::-webkit-scrollbar-thumb,
+.ClassList::-webkit-scrollbar-thumb,
+.RecyclerViewport::-webkit-scrollbar-thumb,
+.ContentBody::-webkit-scrollbar-thumb,
+.GlobalSearchDropdown::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.6);
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.Sidebar::-webkit-scrollbar-thumb:hover,
+.ClassList::-webkit-scrollbar-thumb:hover,
+.RecyclerViewport::-webkit-scrollbar-thumb:hover,
+.ContentBody::-webkit-scrollbar-thumb:hover,
+.GlobalSearchDropdown::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.9);
+    box-shadow: 0 0 6px rgba(99, 102, 241, 0.4);
 }
