@@ -997,3 +997,301 @@ body {
     background: rgba(99, 102, 241, 0.9);
     box-shadow: 0 0 6px rgba(99, 102, 241, 0.4);
 }
+
+/* Advanced Search Overlay Styles */
+.AdvancedSearchButton {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: var(--accent);
+}
+
+.AdvancedSearchButton:hover {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: var(--accent);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.AdvancedSearchButton svg {
+    display: block;
+}
+
+.AdvancedSearchOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.AdvancedSearchPanel {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(18, 18, 18, 0.98) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.1);
+    width: 100%;
+    max-width: 800px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ASHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.ASHeader h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.ASClose {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.ASClose:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-1);
+}
+
+.ASControls {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.ASSearchInputWrapper {
+    margin-bottom: 16px;
+}
+
+.ASSearchInputWrapper input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-1);
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.ASSearchInputWrapper input:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.ASFilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+}
+
+.ASFilters label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-2);
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.ASFilters label:hover {
+    color: var(--text-1);
+}
+
+.ASFilters label.Disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ASFilters input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+.ASFilters label.Disabled input[type="checkbox"] {
+    cursor: not-allowed;
+}
+
+.ASFilters .Hint {
+    font-size: 12px;
+    color: var(--text-3);
+    font-style: italic;
+}
+
+.ASResults {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+    min-height: 300px;
+    max-height: calc(85vh - 300px);
+}
+
+.ASResultItem {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ASResultItem:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateX(2px);
+}
+
+.ASResultItem.ASResultFocused {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.ASResultType {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.ASResultItem:has(.ASResultType:first-child) .ASResultType {
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+}
+
+.ASResultName {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-1);
+    margin-bottom: 4px;
+}
+
+.ASResultClass {
+    font-size: 13px;
+    color: #60a5fa;
+    margin-bottom: 6px;
+}
+
+.ASResultDetails {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+
+.ASResultTypeName {
+    color: #34d399;
+}
+
+.ASResultOffset {
+    color: #fbbf24;
+    font-family: 'Courier New', monospace;
+}
+
+.ASResultMatchType {
+    font-size: 11px;
+    color: var(--text-3);
+    font-style: italic;
+}
+
+.ASResultFuzzy {
+    font-size: 11px;
+    color: var(--warning);
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.ASHighlight {
+    background: rgba(255, 235, 59, 0.3);
+    color: #fbbf24;
+    padding: 1px 2px;
+    border-radius: 2px;
+    font-weight: 600;
+}
+
+.ASNoResults {
+    text-align: center;
+    color: var(--text-3);
+    padding: 60px 20px;
+    font-size: 15px;
+}
+
+.ASStatus {
+    padding: 12px 24px;
+    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+    font-size: 12px;
+    color: var(--text-3);
+    text-align: right;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .AdvancedSearchPanel {
+        max-width: 95vw;
+        max-height: 90vh;
+    }
+    
+    .ASFilters {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .AdvancedSearchButton {
+        padding: 4px 6px;
+    }
+}

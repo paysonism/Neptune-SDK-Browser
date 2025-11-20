@@ -157,6 +157,14 @@
                     </svg>
                     <input type="text" class="TopSearchInput" placeholder="Search offsets, members, types..."
                         id="TopSearchInput">
+                    <button class="AdvancedSearchButton" id="AdvancedSearchButton" onclick="window.AdvancedSearch && window.AdvancedSearch.open()" title="Advanced Search (Ctrl+K)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                            <line x1="11" y1="8" x2="11" y2="14"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                    </button>
                     <div class="GlobalSearchDropdown" id="GlobalSearchDropdown"></div>
                 </div>
             </div>
@@ -205,7 +213,32 @@
         </div>
     </div>
 
+    <!-- Advanced Search Overlay -->
+    <div id="AdvancedSearchOverlay" class="AdvancedSearchOverlay" style="display:none;">
+        <div class="AdvancedSearchPanel">
+            <div class="ASHeader">
+                <h2>Global Search</h2>
+                <button id="ASClose" class="ASClose">×</button>
+            </div>
+            <div class="ASControls">
+                <div class="ASSearchInputWrapper">
+                    <input id="ASQuery" type="text" placeholder="Search..." autocomplete="off" />
+                </div>
+                <div class="ASFilters">
+                    <label><input type="checkbox" id="ASClasses" checked /> Classes</label>
+                    <label><input type="checkbox" id="ASMembers" checked /> Members</label>
+                    <label title="Not yet implemented" class="Disabled"><input type="checkbox" disabled /> Functions</label>
+                    <label title="Not yet implemented" class="Disabled"><input type="checkbox" disabled /> Enums</label>
+                    <label><input type="checkbox" id="ASTypeSearch" /> Type Search <span class="Hint">Search member type instead of name.</span></label>
+                </div>
+            </div>
+            <div id="ASResults" class="ASResults"></div>
+            <div id="ASStatus" class="ASStatus"></div>
+        </div>
+    </div>
+
     <script src="loader.js"></script>
+    <script src="advanced-search.js"></script>
 
     <script>
         let viewer;
@@ -878,6 +911,16 @@
                 topSearchInput.style.fontFamily = "'Bahnschrift', 'Bahnschrift-Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif";
                 topSearchInput.style.fontWeight = '500';
             }
+
+            // Ctrl+K shortcut for advanced search
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    if (window.AdvancedSearch && window.AdvancedSearch.open) {
+                        window.AdvancedSearch.open();
+                    }
+                }
+            });
         });
     </script>
 </body>

@@ -204,6 +204,11 @@ async function InitializeViewer() {
 
         PopulateClassList();
 
+        // Initialize advanced search index
+        if (window.AdvancedSearch && window.AdvancedSearch.initIndex) {
+            window.AdvancedSearch.initIndex(Classes);
+        }
+
         const desired = GetQueryParam('Class');
         const FirstClass = Object.keys(Classes)[0];
         if (desired && Classes[desired]) {
