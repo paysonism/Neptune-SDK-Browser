@@ -155,7 +155,7 @@ async function InitializeViewer() {
     Classes = {};
     try {
         if (globalsInstance && globalsInstance.raw) {
-            const VirtualName = 'Globals';
+            const VirtualName = 'Offsets and Globals';
             const Members = [];
             const raw = globalsInstance.raw;
             if (raw.bases) {
@@ -193,7 +193,7 @@ async function InitializeViewer() {
                 if (SDKUpdated) {
                     notice.classList.remove('error');
                     notice.classList.add('success');
-                    notice.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg><span>SDK Updated</span>';
+                    notice.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg><span>SDK Up to Date</span>';
                 } else {
                     notice.classList.remove('success');
                     notice.classList.add('error');
